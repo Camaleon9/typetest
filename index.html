@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ticker drill — type test</title>
+<meta name="description" content="A fast little typing test — meme &amp; ticker words. How fast can you go?">
+<meta property="og:title" content="ticker drill — type test">
+<meta property="og:description" content="How fast can you type? Meme &amp; ticker words, live WPM.">
+<style>
+  :root{ --bg:#111112; --sub:#3f4144; --fg:#d8d7d1; --dim:#6b6d70; --ok:#8fd39a; --err:#e05a5a; --caret:#e6b34a; --accent:#7fd0e0; }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; height:100%; }
+  body{ background:var(--bg); color:var(--fg);
+        font-family:'JetBrains Mono','Consolas','SF Mono',ui-monospace,monospace;
+        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px;
+        padding:32px 28px; user-select:none; overflow:hidden;
+        -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+        animation:fade .24s ease; }
+  @keyframes fade{ from{ opacity:0; } to{ opacity:1; } }
+  .cap{ font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); }
+
+  .lens{ display:flex; gap:8px; }
+  .lens button{ min-width:44px; }
+  .lens button.sel{ border-color:var(--accent); color:var(--accent); background:#16262b; }
+
+  .stats{ display:flex; gap:30px; font-variant-numeric:tabular-nums; }
+  .stat{ display:flex; flex-direction:column; align-items:center; gap:3px; }
+  .stat b{ font-size:26px; font-weight:600; color:var(--accent); line-height:1;
+           transition:font-size .3s cubic-bezier(.2,.75,.2,1); }
+  .stat.done b{ font-size:44px; }
+  .stat span{ font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim); }
+
+  #words{ position:relative; width:min(90vw,720px); font-size:27px; line-height:1.72;
+          letter-spacing:.02em; text-align:center; }
+  #stream{ transition:opacity .2s ease; }
+  #stream.in{ animation:streamIn .3s ease; }
+  @keyframes streamIn{ from{ opacity:0; } to{ opacity:1; } }
+  #stream .word{ display:inline-block; white-space:nowrap; margin:0 .12em; }
+  #stream .ch{ color:var(--sub); transition:color .1s ease, opacity .1s ease; }
+  #stream .ch.c{ color:var(--fg); }
+  #stream .ch.w{ color:var(--err); }
+  #stream .ch.x{ opacity:.8; }
+  #caret{ position:absolute; left:0; top:0; width:2px; height:1em; background:var(--caret);
+          border-radius:2px; box-shadow:0 0 7px rgba(230,179,74,.65); transform:translate(0,0);
+          transition:transform .11s cubic-bezier(.2,.75,.2,1), height .11s ease, opacity .22s ease;
+          animation:blink 1.05s step-end infinite; will-change:transform; }
+  #caret.off{ opacity:0; animation:none; }
+  @keyframes blink{ 50%{ opacity:0; } }
+
+  .bar{ display:flex; gap:12px; align-items:center; }
+  button{ background:#1c1d1f; color:var(--fg); border:1px solid #303234; border-radius:7px;
+          padding:8px 16px; font-family:inherit; font-size:13px; cursor:pointer; letter-spacing:.04em;
+          transition:border-color .15s ease, color .15s ease, background .15s ease; }
+  button:hover{ border-color:var(--accent); color:var(--accent); }
+  .hint{ font-size:11px; color:var(--sub); letter-spacing:.06em; }
+</style>
+</head>
+<body>
+  <div class="cap" id="cap">ticker drill · 25 words</div>
+  <div class="lens" id="lens">
+    <button data-n="10">10</button>
+    <button data-n="25" class="sel">25</button>
+    <button data-n="50">50</button>
+  </div>
+  <div class="stats" id="stats">
+    <div class="stat"><b id="s-wpm">0</b><span>wpm</span></div>
+    <div class="stat"><b id="s-acc">100</b><span>acc %</span></div>
+    <div class="stat"><b id="s-time">0.0</b><span>sec</span></div>
+  </div>
+  <div id="words"><div id="caret" class="off"></div><div id="stream">click / type to start</div></div>
+  <div class="bar">
+    <button id="restart">↻ restart</button>
+    <span class="hint" id="hint">type to start · <b>Tab</b> restart</span>
+  </div>
+
+<script>
+(function(){
+  // The terminal's live ticker-drill pool, snapshotted — raw coin/deploy words.
+  // Racial-slur variants are the only thing dropped.
+  var POOL = ["giga","Determined","pepe","giraffe","lion","seal","ath","bear","sloth","Cricket","otter","hamster","hate","skibidi","pump","raccoon","POTATO","fud","FAQFAF","alpha","quokka","meme","moodeng","floor","menace","freedom","banger","ify","Pete","frog","moment","community","grok","npc","This","Honest","drake","millionaires","PLEROMA","jimothy","alpaca","cat","bags","candle","cooked","ai","Runner","USWR","larp","send","Phelps","possum","BOOGIE","will","NENCY","turtle","coins","Watching","Ann","MIKE","anon","mewing","dolphin","snake","pelusi","unc","Flying","ticker","Jeet","just","CAMERON","printer","maxxing","dump","fable","crab","hodl","Astro","Offline","bacon","bull","yapping","aura","what","Token","cope","clip","openai","llama","holder","moon","bundle","deploy","xai","Tits","snek","musk","meta","mint","whale","canon","ngmi","duck","up","owl","Deerothy","ADC","doge","grindset","Low","Lead","rhino","Arrest","Netanyahu","go","sniper","ification","tiger","ZachXBT","zoomer","GML","monkey","liquidity","Coin","your","ADOG","penguin","CDL","capybara","based","migrate","Peace","seethe","bonk","of","tesla","nietzschean","sigma","justice","inu","shiba","chad","hampter","apple","nvidia","wagmi","panda","Rob","Is","number","boomer","american","trencher","needs","Growth","delulu","Trans","dip","pig","Widdecombe","rug","goated","Everything","ETH","solana","red","pesto","valid","trump","Gelato","Official","pudgy","ORGMIKE","Spain","goose","brainrot","elephant","wolf","Promised","ape","vibe","TFP","IRS","soul","cow","Problem","Ranger","normie","sol","Feminine","glazing","gyatt","mogging","green","lore","Marketing","CATHOLIC","koala","wardrobe","hippo","kanye","dog","ohio","Rideer","CENTURY","bloomer","fox","spacex","fren","doomer","ratio","wojak","gigachad","ORGASME","looksmax","rizz","goat","nuke","maxi","People","ferret","the","Mamdani","for","Hank","CHIP","degen","axolotl","elon"];
+  var count = 25;
+  var wordsArr=[], typedWords=[], wi=0, started=false, finished=false, startTime=0, timer=null;
+  var keystrokes=0, correctKeystrokes=0;
+
+  var wordsEl=document.getElementById('words');
+  var streamEl=document.getElementById('stream');
+  var caretEl=document.getElementById('caret');
+  var sWpm=document.getElementById('s-wpm'), sAcc=document.getElementById('s-acc'), sTime=document.getElementById('s-time');
+  var statsEl=document.getElementById('stats'), hintEl=document.getElementById('hint'), capEl=document.getElementById('cap');
+  var restartBtn=document.getElementById('restart'), lensEl=document.getElementById('lens');
+
+  try{ var saved=parseInt(localStorage.getItem('tt_count'),10); if([10,25,50].indexOf(saved)>=0) count=saved; }catch(e){}
+
+  function esc(c){ return c==='&'?'&amp;':c==='<'?'&lt;':c==='>'?'&gt;':(c===' '?'&nbsp;':c); }
+
+  function pickN(n){
+    var p=POOL.slice();
+    for(var i=p.length-1;i>0;i--){ var j=(Math.random()*(i+1))|0; var t=p[i]; p[i]=p[j]; p[j]=t; }
+    return p.slice(0, Math.min(n, p.length));
+  }
+
+  // Each word graded independently: an error in one never bleeds into the next;
+  // space commits the current word and jumps to a fresh next one.
+  function correctChars(){
+    var n=wi;
+    for(var i=0;i<wordsArr.length;i++){
+      var tw=wordsArr[i], pw=typedWords[i]||'';
+      for(var k=0;k<pw.length&&k<tw.length;k++) if(pw[k]===tw[k]) n++;
+    }
+    return n;
+  }
+
+  function render(){
+    var html='';
+    for(var i=0;i<wordsArr.length;i++){
+      var tw=wordsArr[i], pw=typedWords[i]||'', inner='', n=Math.max(tw.length, pw.length);
+      for(var k=0;k<n;k++){
+        var cls='ch ', ch;
+        if(k<tw.length){ ch=esc(tw[k]); cls+=(k<pw.length ? (pw[k]===tw[k]?'c':'w') : 'u'); }
+        else { ch=esc(pw[k]); cls+='w x'; }
+        inner+='<span class="'+cls+'">'+ch+'</span>';
+      }
+      html+='<span class="word">'+inner+'</span>';
+      if(i<wordsArr.length-1) html+=' ';
+    }
+    streamEl.innerHTML=html;
+    placeCaret();
+    if(!finished) liveStats();
+  }
+
+  function placeCaret(){
+    if(finished){ caretEl.classList.add('off'); return; }
+    var wordEls=streamEl.querySelectorAll('.word'), cw=wordEls[wi];
+    if(!cw){ caretEl.classList.add('off'); return; }
+    var chs=cw.querySelectorAll('.ch'), pwLen=(typedWords[wi]||'').length;
+    var base=wordsEl.getBoundingClientRect(), r, x, y;
+    if(chs.length && pwLen<chs.length){ r=chs[pwLen].getBoundingClientRect(); x=r.left-base.left; }
+    else if(chs.length){ r=chs[chs.length-1].getBoundingClientRect(); x=r.right-base.left; }
+    else { r=cw.getBoundingClientRect(); x=r.left-base.left; }
+    y=r.top-base.top;
+    caretEl.style.height=r.height+'px';
+    caretEl.style.transform='translate('+x+'px,'+y+'px)';
+    caretEl.classList.remove('off');
+  }
+
+  function liveStats(){
+    if(!started){ sWpm.textContent='0'; sAcc.textContent='100'; sTime.textContent='0.0'; return; }
+    var el=(performance.now()-startTime)/1000, cc=correctChars();
+    sWpm.textContent = el>0 ? Math.round((cc/5)/(el/60)) : 0;
+    sAcc.textContent = keystrokes ? Math.round(correctKeystrokes/keystrokes*100) : 100;
+    sTime.textContent = el.toFixed(1);
+  }
+
+  function tween(el, to, ms){
+    var from=parseFloat(el.textContent)||0, t0=performance.now();
+    (function step(t){
+      var p=Math.min(1,(t-t0)/ms), e=1-Math.pow(1-p,3);
+      el.textContent=Math.round(from+(to-from)*e);
+      if(p<1) requestAnimationFrame(step); else el.textContent=to;
+    })(t0);
+  }
+
+  function finish(){
+    finished=true;
+    if(timer){ clearInterval(timer); timer=null; }
+    var el=(performance.now()-startTime)/1000, cc=correctChars();
+    var wpm=el>0?Math.round((cc/5)/(el/60)):0, acc=keystrokes?Math.round(correctKeystrokes/keystrokes*100):100;
+    render();
+    sTime.textContent=el.toFixed(1);
+    var s=statsEl.querySelectorAll('.stat'); for(var i=0;i<s.length;i++) s[i].classList.add('done');
+    tween(sWpm,wpm,520); tween(sAcc,acc,520);
+    hintEl.innerHTML='<b>Tab</b> or <b>Enter</b> for a new set';
+  }
+
+  function startClock(){ if(!started){ started=true; startTime=performance.now(); timer=setInterval(liveStats,100); } }
+
+  function restart(){
+    wordsArr=pickN(count); typedWords=[]; for(var i=0;i<wordsArr.length;i++) typedWords.push('');
+    wi=0; started=false; finished=false; startTime=0; keystrokes=0; correctKeystrokes=0;
+    if(timer){ clearInterval(timer); timer=null; }
+    var s=statsEl.querySelectorAll('.stat'); for(var i=0;i<s.length;i++) s[i].classList.remove('done');
+    hintEl.innerHTML='type to start · <b>Tab</b> restart';
+    capEl.textContent='ticker drill · '+count+' words';
+    restartBtn.blur();
+    render();
+    streamEl.classList.remove('in'); void streamEl.offsetWidth; streamEl.classList.add('in');
+  }
+
+  function setCount(n){
+    count=n;
+    try{ localStorage.setItem('tt_count', String(n)); }catch(e){}
+    var b=lensEl.querySelectorAll('button');
+    for(var i=0;i<b.length;i++) b[i].classList.toggle('sel', parseInt(b[i].getAttribute('data-n'),10)===n);
+    restart();
+  }
+
+  function onKey(e){
+    if(e.key==='Tab'){ e.preventDefault(); restart(); return; }
+    if(finished){ if(e.key==='Enter') restart(); return; }
+    if(e.metaKey||e.ctrlKey||e.altKey) return;
+    if(e.key==='Backspace'){
+      e.preventDefault();
+      if(typedWords[wi].length) typedWords[wi]=typedWords[wi].slice(0,-1);
+      else if(wi>0) wi--;
+      render(); return;
+    }
+    if(e.key==='Enter') return;
+    if(e.key.length!==1) return;
+    if(e.key===' '){
+      e.preventDefault();
+      if(!typedWords[wi].length) return;
+      startClock();
+      keystrokes++;
+      if(typedWords[wi]===wordsArr[wi]) correctKeystrokes++;
+      if(wi>=wordsArr.length-1){ finish(); return; }
+      wi++; render(); return;
+    }
+    startClock();
+    if(typedWords[wi].length>=wordsArr[wi].length+10) return;
+    var expected=wordsArr[wi][typedWords[wi].length];
+    keystrokes++;
+    if(e.key===expected) correctKeystrokes++;
+    typedWords[wi]+=e.key;
+    if(wi>=wordsArr.length-1 && typedWords[wi].length>=wordsArr[wi].length){ finish(); return; }
+    render();
+  }
+
+  document.addEventListener('keydown', onKey);
+  restartBtn.addEventListener('click', restart);
+  lensEl.addEventListener('click', function(e){
+    var b=e.target.closest('button'); if(!b) return;
+    setCount(parseInt(b.getAttribute('data-n'),10));
+  });
+  window.addEventListener('resize', function(){ if(!finished) placeCaret(); });
+
+  // reflect the saved count on the buttons, then start
+  var lb=lensEl.querySelectorAll('button');
+  for(var i=0;i<lb.length;i++) lb[i].classList.toggle('sel', parseInt(lb[i].getAttribute('data-n'),10)===count);
+  restart();
+})();
+</script>
+</body>
+</html>
